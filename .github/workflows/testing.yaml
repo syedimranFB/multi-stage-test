@@ -14,10 +14,8 @@ jobs:
           git config --global user.email "syedimran@4blabs.com"
           git config --global user.name "syedimranFB"
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-sender.git
+          git checkout test
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git
-
-          ls && pwd
-          
           cp /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/DEMO.txt /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           git add .
