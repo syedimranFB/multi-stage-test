@@ -16,8 +16,10 @@ jobs:
           git clone https://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@github.com/syedimranFB/multi-stage-sender.git
           mkdir receiver && cd receiver && git clone https://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@github.com/syedimranFB/multi-stage-test.git
           ls && pwd
-          cp /home/runner/work/multi-stage-sender/DEMO.txt /home/runner/work/receiver/multi-stage-test
-          cd /home/runner/work/receiver/multi-stage-test
-          git add .
-          git commit -m "testing"
-          git push -f --set-upstream https://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@github.com/syedimranFB/receiver-secondary.git main
+    #  - name: comment   
+    #    run: |
+    #       cp /home/runner/work/multi-stage-sender/DEMO.txt /home/runner/work/receiver/multi-stage-test
+    #       cd /home/runner/work/receiver/multi-stage-test
+    #       git add .
+    #       git commit -m "testing"
+    #       git push -f --set-upstream https://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@github.com/syedimranFB/receiver-secondary.git main
