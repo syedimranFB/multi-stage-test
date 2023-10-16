@@ -1,6 +1,3 @@
-this is sender main clint repo 
+testing from sender - to testing env 
 
-
-prod test 123
-
-prod test
+--------------x---X-----X---------------
