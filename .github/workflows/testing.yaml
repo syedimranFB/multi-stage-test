@@ -9,12 +9,16 @@ jobs:
   receive_dispatch:
     runs-on: ubuntu-latest
     steps:
-     - name: git clone
+     - name: clone client Repository
        run: |
           git config --global user.email "syedimran@4blabs.com"
           git config --global user.name "syedimranFB"
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-sender.git
+          cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender
           git checkout test
+   
+     - name: clone testing Repository
+       run: |
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git
           cp /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/DEMO.txt /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
