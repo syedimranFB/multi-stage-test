@@ -18,8 +18,8 @@ jobs:
 
           ls && pwd
           
-          # cp /home/runner/work/multi-stage-sender/DEMO.txt /home/runner/work/receiver/multi-stage-test
-          # cd /home/runner/work/receiver/multi-stage-test
-          # git add .
-          # git commit -m "testing"
-          # git push -f --set-upstream https://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@github.com/syedimranFB/receiver-secondary.git main
+          cp /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/DEMO.txt /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
+          cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
+          git add .
+          git commit -m "testing"
+          git push -f --set-upstream https://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@github.com/syedimranFB/multi-stage-test.git main
