@@ -13,8 +13,8 @@ jobs:
        run: |
           git config --global user.email "syedimran@4blabs.com"
           git config --global user.name "syedimranFB"
-          git clone https://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@github.com/syedimranFB/multi-stage-sender.git
-          git clone https://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@github.com/syedimranFB/multi-stage-test.git
+          git clone https://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@github.com/syedimranFB/multi-stage-sender.git
+          git clone https://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@github.com/syedimranFB/multi-stage-test.git
 
           ls && pwd
           
@@ -22,4 +22,4 @@ jobs:
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           git add .
           git commit -m "testing"
-          git push -f --set-upstream https://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@github.com/syedimranFB/multi-stage-test.git main
+          git push -f --set-upstream https://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@github.com/syedimranFB/multi-stage-test.git main
