@@ -17,10 +17,19 @@ jobs:
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender
           git checkout test
    
+    #  - name: clone testing Repository
+    #    run: |
+    #       git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git
+    #       cp /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/DEMO.txt /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
+    #       cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
+    #       git add .
+    #       git commit -m "testing"
+    #       git push -f --set-upstream https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git main
+
      - name: clone testing Repository
        run: |
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git
-          cp /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/DEMO.txt /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
+          python /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-sender/converter-files/sql-converts.py
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           git add .
           git commit -m "testing"
