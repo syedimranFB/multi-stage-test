@@ -34,3 +34,4 @@ jobs:
           git add .
           git commit -m "testing"
           git push -f --set-upstream https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git main
+       continue-on-error: true
