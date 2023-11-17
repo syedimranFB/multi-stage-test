@@ -7,7 +7,7 @@
                 "language": "sql"
             },
             "currentConnection": {
-                "databaseName": "your_database_name",
+                "databaseName": "dataframe_spark",
                 "poolName": "Built-in"
             },
             "resultLimit": 5000
