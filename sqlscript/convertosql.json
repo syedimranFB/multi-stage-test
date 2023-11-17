@@ -1,0 +1,17 @@
+{
+    "name": "convertosql",
+    "properties": {
+        "content": {
+            "query": "SELECT TOP (100) [Country]\n,[TotalAmount]\n,[ID]\n FROM [dataframe_spark].[dbo].[data_spark]",
+            "metadata": {
+                "language": "sql"
+            },
+            "currentConnection": {
+                "databaseName": "default",
+                "poolName": "Built-in"
+            },
+            "resultLimit": 5000
+        },
+        "type": "SqlQuery"
+    }
+}
