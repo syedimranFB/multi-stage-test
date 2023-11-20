@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 3",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'users_edrdatalake_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [users_edrdatalake_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://users@edrdatalake.dfs.core.windows.net' \n\t)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "testdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
