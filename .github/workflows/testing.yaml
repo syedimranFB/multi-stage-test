@@ -29,7 +29,9 @@ jobs:
      - name: clone testing Repository
        run: |
           git clone https://${{ secrets.PAT }}@github.com/syedimranFB/multi-stage-test.git
-          python /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test/converter-files/sql-converts.py
+          python /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test/converter-files/script1.py
+          python /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test/converter-files/script2.py
+          python /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test/converter-files/script3.py
           cd /home/runner/work/multi-stage-test/multi-stage-test/multi-stage-test
           git add .
           git commit -m "testing"
