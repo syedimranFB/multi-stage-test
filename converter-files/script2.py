@@ -15,7 +15,7 @@ sql_code = read_sql_file(sql_file_path)
 
 # Load the JSON structure
 json_data = {
-    "name": "Script 02 - Create Silver View.sql",
+    "name": "Script 02 - Create Silver View",
     "properties": {
         "content": {
             "query": sql_code,

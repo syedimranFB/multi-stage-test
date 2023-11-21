@@ -15,7 +15,7 @@ sql_code = read_sql_file(sql_file_path)
 
 # Load the JSON structure
 json_data = {
-    "name": "Script 01 - Create Bronze Ext Table.sql",
+    "name": "Script 01 - Create Bronze Ext Table",
     "properties": {
         "content": {
             "query": sql_code,
