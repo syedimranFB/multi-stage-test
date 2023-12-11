@@ -1,0 +1,124 @@
+{
+	"name": "Notebook 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "82434d9d-2895-4224-8436-943060a32ed0"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"df = spark.read.load('abfss://devops@fbdevopstest.dfs.core.windows.net/synapse/workspaces/data/NYCTripSmall.parquet', format='parquet')\r\n",
+					"display(df.limit(10))"
+				],
+				"execution_count": 38
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df1=spark.sql(\"select * from nyctaxi.trip\")\r\n",
+					"display(df1)"
+				],
+				"execution_count": 33
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"df = spark.sql(\"\"\"\r\n",
+					"    SELECT PassengerCount,\r\n",
+					"        SUM(TripDistanceMiles) as SumTripDistance,\r\n",
+					"        AVG(TripDistanceMiles) as AvgTripDistance\r\n",
+					"    FROM nyctaxi.trip\r\n",
+					"    WHERE TripDistanceMiles > 0 AND PassengerCount > 0\r\n",
+					"    GROUP BY PassengerCount\r\n",
+					"    ORDER BY PassengerCount\r\n",
+					"\"\"\")\r\n",
+					"display(df)\r\n",
+					"df.write.saveAsTable(\"nyctaxi.passengercountstats\")\r\n",
+					""
+				],
+				"execution_count": 64
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df2 = spark.table(\"nyctaxi.passengercountstats\")\r\n",
+					"\r\n",
+					"display(df2)"
+				],
+				"execution_count": 63
+			}
+		]
+	}
+}
