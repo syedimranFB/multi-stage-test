@@ -7,10 +7,27 @@
 			"metadata": "Workspace name",
 			"defaultValue": "fb-devops-test"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=fb-devops-test.database.windows.net;Initial Catalog=master"
+		},
 		"fb-devops-test-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'fb-devops-test-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:fb-devops-test.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://fbdevopstest.dfs.core.windows.net/"
+		},
+		"bing-covid-19-data_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'bing-covid-19-data'"
 		},
 		"fb-devops-test-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
@@ -21,6 +38,61 @@
 		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/bing-covid-19-data')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"sasUri": "[parameters('bing-covid-19-data_sasUri')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/fb-devops-test-WorkspaceDefaultSqlServer')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
@@ -134,37 +206,17 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'users_edrdatalake_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [users_edrdatalake_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://users@edrdatalake.dfs.core.windows.net' \n\t)\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "testdb",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/Script 01 - Create Bronze Ext Table')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t FIRST_ROW = 2,\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'users_edrdatalake_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [users_edrdatalake_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://users@edrdatalake.dfs.core.windows.net' \n\t)\nGO\n\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\nIF EXISTS ( SELECT * FROM sys.external_tables \nWHERE object_id = OBJECT_ID('bronze.COMPANY') )\ndrop EXTERNAL TABLE bronze.COMPANY;\n\n\nCREATE EXTERNAL TABLE bronze.COMPANY (\n\t[CompanyID] nvarchar(4000),\n\t[CompanyName] nvarchar(4000),\n\t[CountryCode] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Test Folder/Sample Data Company.csv',\n\tDATA_SOURCE = [users_edrdatalake_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\nIF EXISTS ( SELECT * FROM sys.external_tables \nWHERE object_id = OBJECT_ID('bronze.TEAM') )\ndrop EXTERNAL TABLE bronze.TEAM;\n\n\n\nCREATE EXTERNAL TABLE bronze.TEAM (\n\t[CompanyID] bigint,\n\t[TeamID] bigint,\n\t[TeamName] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Test Folder/Sample Data Team.csv',\n\tDATA_SOURCE = [users_edrdatalake_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO",
+					"query": "-- this commit is made by syed\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'SynapseDelimitedTextFormat') \n\tCREATE EXTERNAL FILE FORMAT [SynapseDelimitedTextFormat] \n\tWITH ( FORMAT_TYPE = DELIMITEDTEXT ,\n\t       FORMAT_OPTIONS (\n\t\t\t FIELD_TERMINATOR = ',',\n\t\t\t FIRST_ROW = 2,\n\t\t\t USE_TYPE_DEFAULT = FALSE\n\t\t\t))\nGO\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'users_edrdatalake_dfs_core_windows_net') \n\tCREATE EXTERNAL DATA SOURCE [users_edrdatalake_dfs_core_windows_net] \n\tWITH (\n\t\tLOCATION = 'abfss://users@edrdatalake.dfs.core.windows.net' \n\t)\nGO\n\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\nIF EXISTS ( SELECT * FROM sys.external_tables \nWHERE object_id = OBJECT_ID('bronze.COMPANY') )\ndrop EXTERNAL TABLE bronze.COMPANY;\n\n\nCREATE EXTERNAL TABLE bronze.COMPANY (\n\t[CompanyID] nvarchar(4000),\n\t[CompanyName] nvarchar(4000),\n\t[CountryCode] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Test Folder/Sample Data Company.csv',\n\tDATA_SOURCE = [users_edrdatalake_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\nIF EXISTS ( SELECT * FROM sys.external_tables \nWHERE object_id = OBJECT_ID('bronze.TEAM') )\ndrop EXTERNAL TABLE bronze.TEAM;\n\n\n\nCREATE EXTERNAL TABLE bronze.TEAM (\n\t[CompanyID] bigint,\n\t[TeamID] bigint,\n\t[TeamName] nvarchar(4000)\n\t)\n\tWITH (\n\tLOCATION = 'Test Folder/Sample Data Team.csv',\n\tDATA_SOURCE = [users_edrdatalake_dfs_core_windows_net],\n\tFILE_FORMAT = [SynapseDelimitedTextFormat]\n\t)\nGO\n",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "default",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -179,12 +231,12 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('silver.COMPANY') )\nDROP view silver.COMPANY\nGO \n\ncreate view silver.COMPANY as \n\nSELECT \nCAST (CompanyID as int) as 'CompanyID'\n,CompanyName\n,CountryCode as 'CountryCode3Letter'\nFROM bronze.COMPANY\nwhere CompanyID <> 'xxxx'\n\nGO\n\n\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('silver.TEAM') )\nDROP view silver.TEAM\nGO \n\ncreate view silver.TEAM as \n\nSELECT\nCast (CompanyID as int) as 'CompanyID'\n,cast (TeamID as int) as 'TeamID'\n,TeamName\nfrom bronze.TEAM\n\nGO",
+					"query": "-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n-- demo test\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('silver.COMPANY') )\nDROP view silver.COMPANY\nGO \n\ncreate view silver.COMPANY as \n\nSELECT \nCAST (CompanyID as int) as 'CompanyID'\n,CompanyName\n,CountryCode as 'CountryCode3Letter'\nFROM bronze.COMPANY\nwhere CompanyID <> 'xxxx'\n\nGO\n\n\n\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('silver.TEAM') )\nDROP view silver.TEAM\nGO \n\ncreate view silver.TEAM as \n\nSELECT\nCast (CompanyID as int) as 'CompanyID'\n,cast (TeamID as int) as 'TeamID'\n,TeamName\nfrom bronze.TEAM\n\nGO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "default",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -199,12 +251,12 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('gold.TEAM') )\nDROP view gold.TEAM\nGO \n\ncreate view gold.TEAM as \n\nSELECT TeamID, TeamName, CompanyName\nfrom silver.TEAM t \njoin silver.COMPANY c on t.CompanyID = c.CompanyID",
+					"query": "\n-----------------------------------------------------\n-----------------------------------------------------\n-----------------------------------------------------\n\n-- devops ci-cd testing, test env - prod env\nIF EXISTS ( SELECT * FROM sys.views \nWHERE object_id = OBJECT_ID('gold.TEAM') )\nDROP view gold.TEAM\nGO \n\ncreate view gold.TEAM as \n\nSELECT TeamID, TeamName, CompanyName\nfrom silver.TEAM t \njoin silver.COMPANY c on t.CompanyID = c.CompanyID",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "default",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -232,6 +284,213 @@
 				"type": "SqlQuery"
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "548242d5-e72d-4390-bd4a-54434dd8dd81"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://devops@fbdevopstest.dfs.core.windows.net/synapse/workspaces/data/NYCTripSmall.parquet', format='parquet')\r\n",
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 38
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"df1=spark.sql(\"select * from nyctaxi.trip\")\r\n",
+							"display(df1)"
+						],
+						"outputs": [],
+						"execution_count": 33
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.sql(\"\"\"\r\n",
+							"    SELECT PassengerCount,\r\n",
+							"        SUM(TripDistanceMiles) as SumTripDistance,\r\n",
+							"        AVG(TripDistanceMiles) as AvgTripDistance\r\n",
+							"    FROM nyctaxi.trip\r\n",
+							"    WHERE TripDistanceMiles > 0 AND PassengerCount > 0\r\n",
+							"    GROUP BY PassengerCount\r\n",
+							"    ORDER BY PassengerCount\r\n",
+							"\"\"\")\r\n",
+							"display(df)\r\n",
+							"df.write.saveAsTable(\"nyctaxi.passengercountstats\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 64
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"df2 = spark.table(\"nyctaxi.passengercountstats\")\r\n",
+							"\r\n",
+							"display(df2)"
+						],
+						"outputs": [],
+						"execution_count": 63
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 2')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "a7877e99-ab41-4ca9-9ec3-ded253647dfc"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							}
+						},
+						"source": [
+							"%%pyspark\n",
+							"spark.sql(\"DROP DATABASE IF EXISTS venkatdemo CASCADE\")"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sprk1')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": false,
+					"maxNodeCount": 10,
+					"minNodeCount": 3
+				},
+				"nodeCount": 3,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "northeurope"
 		}
 	]
 }
