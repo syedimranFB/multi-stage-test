@@ -3,6 +3,10 @@
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "newpool",
+			"type": "BigDataPoolReference"
+		},
 		"sessionProperties": {
 			"driverMemory": "28g",
 			"driverCores": 4,
@@ -13,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "82434d9d-2895-4224-8436-943060a32ed0"
+				"spark.autotune.trackingId": "e8b26f57-6d0a-4a2e-8d8e-eb4babfbbf5a"
 			}
 		},
 		"metadata": {
@@ -25,6 +29,21 @@
 			},
 			"language_info": {
 				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/d6240a3c-34a4-4a5c-955b-06228bf34ca8/resourceGroups/DevTestOps-RG/providers/Microsoft.Synapse/workspaces/fb-devops-test/bigDataPools/newpool",
+				"name": "newpool",
+				"type": "Spark",
+				"endpoint": "https://fb-devops-test.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/newpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -96,7 +115,7 @@
 					"df.write.saveAsTable(\"nyctaxi.passengercountstats\")\r\n",
 					""
 				],
-				"execution_count": 64
+				"execution_count": 3
 			},
 			{
 				"cell_type": "code",
@@ -118,6 +137,31 @@
 					"display(df2)"
 				],
 				"execution_count": 63
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					}
+				},
+				"source": [
+					"%%sql\r\n",
+					"SELECT *\r\n",
+					"FROM OPENROWSET('Microsoft.ACE.OLEDB.12.0', 'Excel 12.0;Database=C:\\Path\\To\\SampleData.xlsx;HDR=YES', 'SELECT * FROM [Sheet1$]')\r\n",
+					"\r\n",
+					""
+				],
+				"execution_count": 2
 			}
 		]
 	}
